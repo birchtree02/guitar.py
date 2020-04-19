@@ -13,9 +13,12 @@ CIRCLE_FONT_SIZE = 15
 STRINGS = 6
 FRETS  = 5
 
+# music
+NOTE_NUMBERS = {"A":0,"A#":1,"Bb":1,"B":2,"C":3,"C#":4,"Db":4,"D":5,"D#":6,"Eb":6,"E":7,"F":8,"F#":9,"Gb":9,"G":10,"G#":11,"Ab":11}
+DEFAULT_TUNING = ["E", "A", "D", "G", "B", "E"]
 
 class GuitarDisplay():
-    def __init__(self, guitar, chord=None):
+    def __init__(self, guitar, highlights=None):
         pygame.init()
         pygame.display.set_caption('guitar')
 
@@ -27,17 +30,12 @@ class GuitarDisplay():
         self.initialiseValues()
         self.drawGrid()
 
-        self.setString(string=0, fret=2, number=2) # test code to display a G chord
-        self.setString(string=1, fret=1, number=1)
-        self.setString(string=2, fret=0, number=0)
-        self.setString(string=3, fret=0, number=0)
-        self.setString(string=4, fret=0, number=0)
-        self.setString(string=5, fret=2, number=3)
-
-
-        pygame.display.update()
+        if highlights: self.highlightFrets(highlights)
 
         self.waitForClose()
+
+        pygame.display.quit()
+
 
     def initialiseValues(self):    
         self.stringsStartBufferY = BUFFER+FONT_SIZE*2 # to make space for string labels
@@ -53,6 +51,10 @@ class GuitarDisplay():
         for i in range(FRETS+1): # horizontal
             lineY = self.stringsStartBufferY + (self.stringSize//(FRETS))*i
             pygame.draw.line(self.surface, LINE_COLOUR, (0+BUFFER, lineY), (0+BUFFER+self.stringSize, lineY))
+
+    def highlightFrets(self, highlights):
+        for i, highlight in enumerate(highlights):
+            self.setString(i, highlight[0], highlight[1])
 
     def setString(self, string, fret, number):
         number = {-1:"x",0:"o",1:"\u2776",2:"\u2777",3:"\u2778"}[number]
@@ -72,16 +74,53 @@ class GuitarDisplay():
             event = pygame.event.wait()
             if event.type == pygame.QUIT:
                 break
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    break
 
 class Guitar():
-    def __init__(self):
-        self.stringNotes = ["E", "A", "D", "G", "B", "E"]
+    def __init__(self, notes=DEFAULT_TUNING):
+        self.stringNotes = notes
+        self.strings = [String(note) for note in self.stringNotes]
 
     def getStringNotes(self):
         return self.stringNotes
 
+    def display(self, chord=None): # todo: make it display how a particular chord is played on the guitar
+        GuitarDisplay(self, self.getChordPositions(chord) if chord else None)
 
-GuitarDisplay(Guitar())
+    def getChordPositions(self, chord): # todo: make it return how a particular chord is played on the guitar
+        chord = getChord(chord)
+        print(chord)
+        fretDetails = []
+        for i, string in enumerate(self.strings):
+            notePositions = [string.notePosition(note) for note in chord]
+            print(f'notePositions={notePositions}')
+            if min(notePositions) > 3:
+                fretDetails.append([0,-1])
+            else: # todo: determine what number should be applied (0 for open string)
+                fretDetails.append([min(notePositions),1])
+
+        print(f'fretDetails={fretDetails}')
+        return fretDetails
+
+
+class String():
+    def __init__(self, note="E"):
+        self.tune(note)
+
+    def tune(self, note):
+        self.note = note
+        self.noteNumber = NOTE_NUMBERS[note]
+
+    def notePosition(self, note):
+        note = NOTE_NUMBERS[note]
+        if note < self.noteNumber:
+            note += 12
+        return note-self.noteNumber
+
+def getChord(chordString="G"): # todo: make it return the notes of the given chord programmatically
+    pass
+
+def getChord(chordString="G"): # hardcoded solution for the getChord function
+    return {"G":["G","B","D"]}[chordString]
+
+# GuitarDisplay(Guitar(), [[0,-1],[0,0],[2,1],[2,1],[2,1],[0,0]])
+Guitar().display("G")
