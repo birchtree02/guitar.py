@@ -22,27 +22,27 @@ class GuitarDisplay():
         self.surface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.surface.fill(BG_COLOUR)
 
+        self.initialiseValues()
         self.drawGrid()
 
         pygame.display.update()
 
         self.waitForClose()
-        
-    def drawGrid(self):
-        stringsStartBufferY = BUFFER+FONT_SIZE*2 # to allow for string labels
-        # stringsStartBufferY = BUFFER
-        stringSize = HEIGHT-(stringsStartBufferY + BUFFER)
 
+    def initialiseValues(self):    
+        self.stringsStartBufferY = BUFFER+FONT_SIZE*2 # to allow for string labels
+        self.stringSize = HEIGHT-(self.stringsStartBufferY + BUFFER)
+    
+    def drawGrid(self):
         for i in range(STRINGS): # vertical
-            stringX = BUFFER + (stringSize//(STRINGS-1))*(i)
+            stringX = BUFFER + (self.stringSize//(STRINGS-1))*(i)
 
             self.drawText(self.guitar.getStringNotes()[i], (stringX-FONT_SIZE//4, BUFFER))
-            pygame.draw.line(self.surface, LINE_COLOUR, (stringX, 0+stringsStartBufferY), (stringX, stringsStartBufferY+stringSize))
+            pygame.draw.line(self.surface, LINE_COLOUR, (stringX, 0+self.stringsStartBufferY), (stringX, self.stringsStartBufferY+self.stringSize))
 
         for i in range(FRETS+1): # horizontal
-            lineY = stringsStartBufferY + (stringSize//(FRETS))*i
-            pygame.draw.line(self.surface, LINE_COLOUR, (0+BUFFER, lineY), (0+BUFFER+stringSize, lineY))
-
+            lineY = self.stringsStartBufferY + (self.stringSize//(FRETS))*i
+            pygame.draw.line(self.surface, LINE_COLOUR, (0+BUFFER, lineY), (0+BUFFER+self.stringSize, lineY))
 
     def drawText(self, text, position):
         text_surface = pygame.font.Font(None, FONT_SIZE)
