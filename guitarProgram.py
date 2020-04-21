@@ -57,7 +57,8 @@ class GuitarDisplay():
             self.setString(i, highlight[0], highlight[1])
 
     def setString(self, string, fret, number):
-        number = {-1:"x",0:"o",1:"\u2776",2:"\u2777",3:"\u2778"}[number]
+        #number = {-1:"x",0:"o",1:"\u2776",2:"\u2777",3:"\u2778"}[number]
+        number = {-1:"x",0:"o",1:"1",2:"2",3:"3",4:"4",5:"5"}[number]
         labelX = BUFFER + (self.stringSize//(STRINGS-1))*string - CIRCLE_FONT_SIZE//2
         labelY = self.stringsStartBufferY + fret*self.stringSize//FRETS - CIRCLE_FONT_SIZE//2 - (self.stringSize//FRETS)//2
         self.drawText(str(number), (labelX, labelY))
@@ -112,13 +113,21 @@ class Guitar():
                 pass
             else:
                 pass
-
+        fretLabels = [None, None, None, None, None, None]
         for i, fret in enumerate(fretNumbers): # assign a label to the frets
             if fret < 1:
-                fretLabels.append(fret)
+                fretLabels[i] = fret
                 fretNumbers[i] = 0
-            else:
-                fretLabels.append(1)
+        currentFinger = 1
+        rowNumber = 1
+        while None in fretLabels: 
+            #Assign fingerings 
+            for i, fret in enumerate(fretNumbers):
+                if fret == rowNumber:
+                    fretLabels[i] = currentFinger
+                    currentFinger += 1
+            rowNumber += 1
+
 
         fretDetails = []
         for i in range(STRINGS):
@@ -155,4 +164,4 @@ def getChord(chordString="G"): # hardcoded solution for the getChord function
             }[chordString]
 
 # GuitarDisplay(Guitar(), [[0,-1],[0,0],[2,1],[2,1],[2,1],[0,0]])
-Guitar().display("Emin")
+Guitar().display("A")
