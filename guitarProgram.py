@@ -86,19 +86,44 @@ class Guitar():
     def display(self, chord=None): # todo: make it display how a particular chord is played on the guitar
         GuitarDisplay(self, self.getChordPositions(chord) if chord else None)
 
-    def getChordPositions(self, chord): # todo: make it return how a particular chord is played on the guitar
+    def getChordPositions(self, chord):
+        # todo: determine what number should be applied to each fret
+        # todo: make sure that each note of the chord is chosen
         chord = getChord(chord)
-        print(chord)
-        fretDetails = []
+        print(f'chord={chord}')
+        unchosenNotes = chord[:] # copy list
+        fretNumbers = []
+        fretLabels = []
         for i, string in enumerate(self.strings):
-            notePositions = [string.notePosition(note) for note in chord]
-            print(f'notePositions={notePositions}')
-            if min(notePositions) > 3:
-                fretDetails.append([0,-1])
-            else: # todo: determine what number should be applied (0 for open string)
-                fretDetails.append([min(notePositions),1])
+            notePositions = [string.notePosition(chord[0])] if chord==unchosenNotes else [string.notePosition(note) for note in chord]
+            minPosition = min(notePositions)
+            if minPosition > 3:
+                fretNumbers.append(-1)
+            else:
+                chosenNote = chord[notePositions.index(minPosition)]
+                fretNumbers.append(minPosition)
+                if chosenNote in unchosenNotes:
+                    unchosenNotes.remove(chosenNote) # removes the chosen note from unchosenNotes
 
-        print(f'fretDetails={fretDetails}')
+
+        while unchosenNotes:
+            print(f'unchosenNotes={unchosenNotes}')
+            if [0] in fretNumbers:
+                pass
+            else:
+                pass
+
+        for i, fret in enumerate(fretNumbers): # assign a label to the frets
+            if fret < 1:
+                fretLabels.append(fret)
+                fretNumbers[i] = 0
+            else:
+                fretLabels.append(1)
+
+        fretDetails = []
+        for i in range(STRINGS):
+            fretDetails.append([fretNumbers[i], fretLabels[i]])
+
         return fretDetails
 
 
@@ -120,7 +145,14 @@ def getChord(chordString="G"): # todo: make it return the notes of the given cho
     pass
 
 def getChord(chordString="G"): # hardcoded solution for the getChord function
-    return {"G":["G","B","D"]}[chordString]
+    return {
+        "G":["G","B","D"], 
+        "A":["A","C#","E"], 
+        "D":["D","F#","A"], 
+        "E":["E","G#","B"], 
+        "C":["C","E","G"], 
+        "Emin":["E","G","B"]
+            }[chordString]
 
 # GuitarDisplay(Guitar(), [[0,-1],[0,0],[2,1],[2,1],[2,1],[0,0]])
-Guitar().display("G")
+Guitar().display("Emin")
