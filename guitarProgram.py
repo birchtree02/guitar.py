@@ -64,7 +64,7 @@ class GuitarDisplay():
 
 
     def drawText(self, text, position):
-        font = pygame.font.Font(pygame.font.match_font("calibri"), CIRCLE_FONT_SIZE) if ord(text) > 128 else pygame.font.Font(None, FONT_SIZE)
+        font = pygame.font.Font(pygame.font.match_font("Calibri"), CIRCLE_FONT_SIZE) if ord(text) > 128 else pygame.font.Font(None, FONT_SIZE)
         text = font.render(text, True, TEXT_COLOUR, BG_COLOUR)
         self.surface.blit(text, position)
 
